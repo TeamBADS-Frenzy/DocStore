@@ -46,14 +46,14 @@ public class ArticleController {
     @GetMapping("/search/query")
     public ResponseEntity<?> searchArticleByQuery(@RequestParam("query") String query, @RequestBody List<String> tags){
         SearchUtil searchUtil = new SearchUtil();
-        List<Article> response = searchUtil.getAllSearchedArticlesByQueryAndLabels(tags,query);
+        List<Article> response = searchUtil.getAllSearchedArticlesByQueryAndLabels(tags,query,articleServices,tagServices);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<Article>> searchArticleByTags(@RequestBody List<String> tags){
         SearchUtil searchUtil = new SearchUtil();
-        List<Article> response = articleServices.searchArticleByTags(tags);
+        List<Article> response = searchUtil.getAllSearchedArticlesByLabels(tags,articleServices);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
