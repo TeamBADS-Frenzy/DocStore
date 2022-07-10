@@ -1,35 +1,40 @@
 package com.amazon.docstore.controllers;
 
-import com.amazon.docstore.Repository.ArticleRepository;
 import com.amazon.docstore.models.Article;
+import com.amazon.docstore.models.SearchUtil;
+import com.amazon.docstore.models.TagSet;
+import com.amazon.docstore.services.ArticleServices;
+import com.amazon.docstore.services.TagServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/article")
 public class ArticleController {
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleServices articleServices;
+
+    @Autowired
+    private TagServices tagServices;
 
     @GetMapping("/{articleId}")
     public ResponseEntity<Article> getArticleById(@PathVariable("articleId") Integer articleId){
-        String test = "test";
-        Optional<Article> responseArticle = articleRepository.findById(articleId);
-        return new ResponseEntity<>(responseArticle.get(), HttpStatus.OK);
-        //return null;
+        Article responseArticle = articleServices.getArticleById(articleId);
+        return new ResponseEntity<>(responseArticle, HttpStatus.OK);
     }
 
     @PostMapping("/")
     public ResponseEntity<Article> uploadArticle(@RequestBody Article article){
-        String test = "test";
-        articleRepository.save(article);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        Set<String> allTags =  tagServices.getAllTags().getAllTags();
+        allTags.addAll(article.getTags());
+        tagServices.updateTagSet(new TagSet(111,allTags));
+        return new ResponseEntity<>(articleServices.insertArticle(article), HttpStatus.OK);
     }
 
     @PutMapping("/{articleId}")
@@ -37,9 +42,20 @@ public class ArticleController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Article>> searchArticleByQuery(@RequestParam("query") String query){
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    @GetMapping("/search/query")
+    public ResponseEntity<?> searchArticleByQuery(@RequestParam("query") String query, @RequestBody List<String> tags){
+        //Search search = new Search(query,tags);
+        //List<Article> response = search.getAllSearchedArticlesByQueryAndLabels();
+        List<Article> response = null;
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Article>> searchArticleByTags(@RequestBody List<String> tags){
+        SearchUtil searchUtil = new SearchUtil(tags);
+        List<Article> response = searchUtil.getAllSearchedArticlesByLabels();
+        //List<Article> response = articleServices.searchArticleByTags(tags);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
