@@ -1,7 +1,7 @@
 package com.amazon.docstore.controllers;
 
 import com.amazon.docstore.models.Article;
-import com.amazon.docstore.models.SearchUtil;
+import com.amazon.docstore.Utils.SearchUtil;
 import com.amazon.docstore.models.TagSet;
 import com.amazon.docstore.services.ArticleServices;
 import com.amazon.docstore.services.TagServices;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -44,17 +45,15 @@ public class ArticleController {
 
     @GetMapping("/search/query")
     public ResponseEntity<?> searchArticleByQuery(@RequestParam("query") String query, @RequestBody List<String> tags){
-        //Search search = new Search(query,tags);
-        //List<Article> response = search.getAllSearchedArticlesByQueryAndLabels();
-        List<Article> response = null;
+        SearchUtil searchUtil = new SearchUtil();
+        List<Article> response = searchUtil.getAllSearchedArticlesByQueryAndLabels(tags,query);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<Article>> searchArticleByTags(@RequestBody List<String> tags){
-        SearchUtil searchUtil = new SearchUtil(tags);
-        List<Article> response = searchUtil.getAllSearchedArticlesByLabels();
-        //List<Article> response = articleServices.searchArticleByTags(tags);
+        SearchUtil searchUtil = new SearchUtil();
+        List<Article> response = articleServices.searchArticleByTags(tags);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
