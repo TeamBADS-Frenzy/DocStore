@@ -1,8 +1,9 @@
-package com.amazon.docstore.services;
+package com.amazon.docstore.service;
 
 import com.amazon.docstore.models.TagSet;
 
-public interface TagServices{
+public interface TagService {
     TagSet getAllTags();
+
     void updateTagSet(TagSet T);
 }
